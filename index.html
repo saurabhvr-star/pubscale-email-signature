@@ -6,8 +6,7 @@
 <label class="field">Designation<input id="job" value="Founder &amp; CEO"></label>
 <label class="field">Location<input id="location" value="Bengaluru, India"></label>
 
-<label class="field">Hosted assets folder URL (one-time setup)<input id="assets" placeholder="https://your-username.github.io/pubscale-email-signature/assets/" type="url"></label>
-<div class="notice">Upload the included image assets and your genuine <b>pubscale-animation.gif</b> to a public HTTPS folder. Paste that folder URL above before copying. The preview displays the included GIF locally. When you publish the generator, it automatically uses the <b>assets/</b> subfolder beside the HTML page. For working signatures in Gmail, host the GIF and social icons on public HTTPS URLs.</div>
+<div class="notice">The animated GIF and social icons load automatically from this website. Employees only need to enter their personal details. Open the published GitHub Pages site to copy a working Gmail signature.</div>
 <div class="notice"><b>Company social profiles are fixed:</b> LinkedIn · YouTube · Facebook · X. Employees only edit their own contact details.</div>
 </section><section class="panel"><h2>Signature preview</h2><div id="preview"></div>
 <button id="copy">Copy signature for Gmail</button><button class="secondary" id="download">Download HTML signature</button><div id="status" class="status" aria-live="polite"></div>
@@ -19,14 +18,14 @@ const PREVIEW_LINKEDIN = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAa
 const PREVIEW_YOUTUBE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAaCAYAAABLlle3AAABKUlEQVR4nO2WwY2CQBSG/9EtYDrAaAF40Hbg4N2sLWgdJEIHlsB597CcZROsAKjgeRiVffLiMFnwol8yCRngfQlv+GcUERGezOjZwrd0cD7E2SQG0hQoCuB0auaryox7JpPm2vMArQHfB4KQ37tC92w+icajfsZsSlSWLQWXlmV/wuuI9y0p72n249SbThRFa4pLq9pag4LQTfp3TYjSurIXiSJQ/isvEAlh4XGp8ClEPA90zEFRZJdbpa4EIejr2/weDnCp1m7SJIZaLoAsc3qNh0NXaZpC7bYmQGwINeVEeoBarUxidUWQ8s/rz+1FXISAicWHUuGBfyMtsnb2bvrNXgElHleSGDgcml2lviSVtMtozft222XmwHot9lSWDszrnBze0kE5A9NyNYlL+0vjAAAAAElFTkSuQmCC";
 const PREVIEW_FACEBOOK = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABsAAAAaCAYAAABGiCfwAAAB9klEQVR4nNWWP0wUQRTGfxAK2WYvOUvIdasVnCUmbOEVNGzJ2Wi0kphARWzkLGkgVkpDR45G7Vgaims0/qu8paRbvNIz2GB5Fs9zZ3Zn9vYWQ8KXTHb+7JvvzZf33szEYDAYcEWYLGMU96WNi6mimx98gvbnLInvwYMF8G9BrZq/z0SejOcXsHUErzujHXIdWL8Hm0EJsrgPSy/Hl8v34M1TqDgFyYoQVRxwp0W6XxcQ9ZK1uRn4+qIg2e3ndqKKA9srENR179+fioNDrDdgu6nbZqLRFAQqjjfg4V2zTCpedeCkp89lyLZC+wa+JxKlEfdFyjTaH/WxFvrR9/xTBXV9fNiF1X2JWhPaX2DnfjLWTvbh1E4EEhAqdjt2IpDTqlJqZOOGefxz9D/RWdLXZLR5udOUpPW91PwKnP+WftiVlgeNzBZhwTzUbhrm60k//Ga2Ve00Gedm8z3Lw1lOXg6hnSwt0xBhlMioFtuwm8gY9bJ2taqeKlPpRd+TaqDi2Vv57j2ShP43/w7iH2YHARZTzmeSOq9qj4NaFVqpvTJkvgdrjcuTrTWy95vxpm4tw7yhLBVFKzA7bCRznb8Fd6Ec0eayec36BnEd2HssbdR1DyL/8YadCEY8C1SEXUlQNZSf7IN7A4I79rQpRfY/UOopdy3I/gBAR55UCVmHnQAAAABJRU5ErkJggg==";
 const PREVIEW_X = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAaCAYAAACkVDyJAAACR0lEQVR4nL2W0ZWjIBSGf/fsM9sANBAaWLaAMQ1oA8kUIFOApICQBkgDsYE4DWADbgPSwNJA9iFHo1E0yc7Z/03l55N7uVyiy+VywX/Ut1eN3ns45+C9f8r3/ZnB1loURYGqsmiapntPCAHnHEmSIEnS2TmiR0Ja1zV2OwVr7eJPUcogZRYELwKL4gSl1NOhk1Iiy+To/WxIi+IEKcemR6S1BoARNLhC5xzi+A3eewghQCnrvt3nsK8kSVGW5y4iSilsNtvue3CXaq07U13XkFKCUgrGKPZ7PenJMgnG6CD8/XmCQOcciuLUPXvvIWUGIQS01vj8LJHnagSLolso+15jzDywP6CVtbYDGWPAOYcQYrCye1irqrrt7skcpmkSLIHTqcDhoNE0DsYYlGUJzjm2283k+FZ1/RuEkGkg56tgGVDKYIzB+/sWlFIYc4QQPxfL5ny+/thkSOfMzjXY7RT2ew1rLY5HM1lvoTkngYSQWXPTOHDOkecKWutBPkNq55wEcs6DRkoZtNZYr+MOJKVEniswxoK+9tskcLWaBrb5+/iQaJqmA0URujCHFjC7wjiOF2HAOJ9VZUf1CQCbzW0HTwKFEIOcEEJgjMHhoFHX9WBsC9L6Wirr9XrgpZRBiF/d80NnaRuSufYUxzEI+QEA8P4PyrIEcD15+q1qtj39S7cArifQvX/2ipEkafC4egUGPNjxnXNI0yTYkvqilEEpNbnxHga2WrrTvL3FSNN09uB4Cngv5xwIIYsn05cBX9HL99JX9RdaylgJHn9cAgAAAABJRU5ErkJggg==";
-const names=['name','job','location','assets'];
+const names=['name','job','location'];
 const COMPANY_SITE='https://www.pubscale.com';
 const SOCIAL_URLS={linkedin:'https://www.linkedin.com/company/pubscale/',youtube:'https://www.youtube.com/@pubscale',facebook:'https://www.facebook.com/greedygame.media',x:'https://x.com/GreedyGameMedia'};
 const el=id=>document.getElementById(id), val=id=>el(id).value.trim();
 const esc=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const validUrl=s=>/^https:\/\/[^\s/]+/i.test(s);
 const staticIcons={linkedin:PREVIEW_LINKEDIN,youtube:PREVIEW_YOUTUBE,facebook:PREVIEW_FACEBOOK,x:PREVIEW_X};
-function base(){let b=val('assets');if(b)return b.replace(/\/+$/,'')+'/';if(location.protocol==='https:' || location.protocol==='http:')return new URL('assets/',location.href).href;return ''}
+function base(){if(location.protocol==='https:' || location.protocol==='http:')return new URL('./assets/',location.href).href;return ''}
 function signature(production=false){
  const b=base(), icon=(k)=> production?b+k+'.png':(b?b+k+'.png':staticIcons[k]);
  const gif=production?b+'pubscale-animation.gif':(b?b+'pubscale-animation.gif':'pubscale-animation.gif');
@@ -37,7 +36,7 @@ function signature(production=false){
 }
 function render(){el('preview').innerHTML=signature(false);el('status').textContent=''}
 for(let n of names)el(n).addEventListener('input',render);
-function check(){if(!base().startsWith('https://'))throw new Error('Host the generator on HTTPS or enter your public HTTPS assets folder URL before copying.');if(!val('name'))throw new Error('Enter an employee name.');return signature(true)}
+function check(){if(!base().startsWith('https://'))throw new Error('Open the published GitHub Pages generator using HTTPS before copying. Local file previews are not suitable for Gmail.');if(!val('name'))throw new Error('Enter an employee name.');return signature(true)}
 el('copy').addEventListener('click',async()=>{try{const html=check();const blob=new Blob([html],{type:'text/html'});if(!navigator.clipboard?.write||typeof ClipboardItem==='undefined'){el('status').textContent='Use Download HTML, then open it in Chrome and copy the rendered signature.';return;}await navigator.clipboard.write([new ClipboardItem({'text/html':blob,'text/plain':new Blob([val('name')+' | '+val('job')+' | '+COMPANY_SITE],{type:'text/plain'})})]);el('status').textContent='Signature copied! Paste into Gmail signature settings.'}catch(e){el('status').textContent=e.message}});
 el('download').addEventListener('click',()=>{try{const content=check();const doc='<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>'+content+'</body></html>';const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([doc],{type:'text/html'}));a.download='pubscale-signature-'+val('name').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.html';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);el('status').textContent='HTML file downloaded.'}catch(e){el('status').textContent=e.message}});
 render();
