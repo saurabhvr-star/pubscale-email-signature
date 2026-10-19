@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PubScale | Email Signature Generator</title>
+<style>
+:root{font-family:Arial,Helvetica,sans-serif;color:#17322f;background:#f4f7f7}
+*{box-sizing:border-box}body{margin:0}.wrap{max-width:1140px;margin:44px auto;padding:0 22px}
+header{margin-bottom:24px}h1{font-size:28px;letter-spacing:-.7px;margin:0 0 8px}h2{font-size:17px;margin:0 0 18px}
+.description{color:#586b68;font-size:14px;margin:0}.layout{display:grid;grid-template-columns:325px minmax(0,1fr);gap:22px}
+.panel{background:#fff;border:1px solid #d9e6e3;border-radius:12px;padding:24px;box-shadow:0 5px 18px rgba(13,45,41,.04)}
+.field{display:block;font-weight:bold;font-size:13px;margin:0 0 16px}.field input,.field select{display:block;margin-top:7px;width:100%;border:1px solid #c5d5d1;border-radius:7px;height:41px;padding:0 12px;font:14px Arial;color:#223a37;background:white}
+.field input:focus,.field select:focus{outline:2px solid #8ce0da;outline-offset:1px}
+.hint{font-size:12px;color:#667975;line-height:1.5}.spacer{height:12px}.divline{border:0;border-top:1px solid #e5eeee;margin:22px 0}
+.widthrow{display:flex;align-items:center;gap:12px}.widthrow input[type=range]{flex:1;accent-color:#18aaa3}.widthrow output{min-width:60px;font-weight:bold;color:#167c77;text-align:right}
+.presets{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:16px}.preset{border:1px solid #d0e1de;background:#fff;color:#345450;border-radius:7px;padding:10px 4px;font-size:12px;font-weight:700;cursor:pointer}.preset[aria-pressed=true]{background:#e2f7f4;border:2px solid #20aaa3;color:#087e76;padding:9px 3px}
+.previewWrap{min-height:260px;background:#f7f9f9;border:1px solid #e1ebea;border-radius:8px;overflow:auto;padding:20px;display:flex;align-items:center;justify-content:flex-start}.previewWrap table{flex:none}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 10px}button.action{font:700 14px Arial;padding:12px 17px;border:0;border-radius:7px;background:#16a9a3;color:white;cursor:pointer}button.action.secondary{background:#e8f5f3;color:#087a73}
+#status{font-size:13px;min-height:20px;color:#17766f;margin:7px 0}.note{font-size:12px;background:#f0f9f8;padding:12px 14px;line-height:1.6;border-radius:7px;color:#345f5a;margin-top:17px}
+.footer{font-size:12px;color:#657470;line-height:1.6;margin-top:22px}strong{color:#173c38}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.wrap{margin:20px auto;padding:0 12px}.panel{padding:17px}.previewWrap{padding:12px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header><h1>PubScale Signature Generator</h1><p class="description">Create your Gmail signature in seconds. Choose a size, enter your name and designation, and copy the result.</p></header>
+<div class="layout">
+<section class="panel">
+<h2>Employee details</h2>
+<label class="field">Full name<input id="employeeName" type="text" value="Arpit Jain" autocomplete="name" maxlength="90"></label>
+<label class="field">Designation<input id="designation" type="text" value="Founder &amp; CEO" maxlength="100"></label>
+<div class="note" style="margin-top:0"><strong>Company identity:</strong> PubScale | GreedyGame is fixed in every signature, matching the approved design.</div>
+<hr class="divline">
+<h2>Signature size</h2>
+<div class="presets" role="group" aria-label="Signature size presets">
+<button type="button" class="preset" data-width="460" aria-pressed="false">Small<br><span style="font-weight:400">460 px</span></button>
+<button type="button" class="preset" data-width="520" aria-pressed="true">Compact<br><span style="font-weight:400">520 px</span></button>
+<button type="button" class="preset" data-width="640" aria-pressed="false">Original<br><span style="font-weight:400">640 px</span></button>
+</div>
+<label for="customWidth" class="field" style="margin-bottom:8px">Custom signature width</label>
+<div class="widthrow"><input type="range" id="customWidth" min="440" max="700" step="10" value="520" aria-label="Custom signature width"><output for="customWidth" id="widthDisplay">520 px</output></div>
+<p class="hint">Range: 440–700 px. Compact (520 px) is the recommended default. The 440 × 280 GIF keeps its aspect ratio; text, icons, and spacing also resize.</p>
+<div class="note"><strong>Company-managed links:</strong> PubScale website, LinkedIn, YouTube, Facebook, and X are already configured. No social links need to be entered.</div>
+</section>
+<section class="panel">
+<h2>Live signature preview</h2>
+<div class="previewWrap" id="preview" aria-label="Signature preview"></div>
+<div class="actions"><button type="button" class="action" id="copyButton">Copy signature for Gmail</button><button type="button" class="action secondary" id="downloadButton">Download HTML</button></div>
+<div id="status" role="status" aria-live="polite"></div>
+<p class="hint">After copying: Gmail → Settings → See all settings → General → Signature → paste → Save Changes.</p>
+</section>
+</div>
+<p class="footer">The company identity line is fixed as PubScale | GreedyGame. Animation target: 440 × 280 px. The generator uses official company image assets. Open it from your published GitHub Pages HTTPS URL before copying. Existing Gmail signatures do not update automatically when you change this page.</p>
+</main>
+<script>
+'use strict';
+const SOCIALS = [
+  {name:'LinkedIn',file:'linkedin.png',url:'https://www.linkedin.com/company/pubscale/'},
+  {name:'YouTube',file:'youtube.png',url:'https://www.youtube.com/@pubscale'},
+  {name:'Facebook',file:'facebook.png',url:'https://www.facebook.com/greedygame.media'},
+  {name:'X',file:'x.png',url:'https://x.com/GreedyGameMedia'}
+];
+const SITE = 'https://www.pubscale.com/';
+const el = id => document.getElementById(id);
+const clean = value => String(value).trim();
+const escapeHTML = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+const names = ['employeeName','designation'];
+const COMPANY_LINE = 'PubScale | GreedyGame';
+let selectedWidth = 520;
+
+// GitHub Pages project sites can live under /repo-name/. The URL resolves correctly
+// at any HTTPS domain and doesn't require the employee to enter an asset URL.
+function assetURL(file) {
+  return new URL('assets/' + file, document.baseURI).href;
+}
+
+function dimensions(width) {
+  // Revised animation is 440 x 280 (11:7 aspect ratio).
+  // These display widths intentionally keep text readable at compact sizes.
+  const interpolate = (value, points) => {
+    if (value <= points[0][0]) return points[0][1];
+    for (let i = 1; i < points.length; i++) {
+      if (value <= points[i][0]) {
+        const [x0,y0] = points[i-1];
+        const [x1,y1] = points[i];
+        return Math.round(y0+(value-x0)*(y1-y0)/(x1-x0));
+      }
+    }
+    const [x0,y0]=points[points.length-2];
+    const [x1,y1]=points[points.length-1];
+    return Math.round(y1+(value-x1)*(y1-y0)/(x1-x0));
+  };
+  const gif = interpolate(width, [[440,130],[460,135],[520,150],[640,185],[700,200]]);
+  const left = gif + interpolate(width,[[440,24],[520,34],[640,44],[700,48]]);
+  const divider = width < 500 ? 2 : 3;
+  const scale = width/640;
+  const px = (num,min=1)=>Math.max(min,Math.round(num*scale));
+  return {
+    width, left, divider, right:width-left-divider,
+    gif, imageHeight:Math.round(gif*280/440),
+    padding: px(16,8), rightPad: px(19,12),
+    name: px(18,13), role:px(12,10), info:px(12,10),
+    icon:px(24,16), gap:px(12,7)
+  };
+}
+function signatureHTML(width = selectedWidth) {
+  const d=dimensions(width);
+
+  const name=escapeHTML(clean(el('employeeName').value));
+  const job=escapeHTML(clean(el('designation').value));
+  const companyLine=escapeHTML(COMPANY_LINE);
+  const socials=SOCIALS.map((s,i)=>`<td valign="middle" style="padding:0 ${i===SOCIALS.length-1?0:d.gap}px 0 0;"><a href="${s.url}" style="text-decoration:none;"><img src="${assetURL(s.file)}" width="${d.icon}" height="${d.icon}" alt="${s.name}" style="display:block;width:${d.icon}px;height:${d.icon}px;border:0;"></a></td>`).join('');
+  return `<table role="presentation" width="${width}" cellpadding="0" cellspacing="0" border="0" style="width:${width}px;border-collapse:collapse;table-layout:fixed;background-color:#ffffff;font-family:Arial,Helvetica,sans-serif;"><tbody><tr>`+
+    `<td width="${d.left}" align="center" valign="middle" style="width:${d.left}px;padding:${d.padding}px ${Math.max(7,d.padding-2)}px;vertical-align:middle;"><a href="${SITE}" style="text-decoration:none;"><img src="${assetURL('pubscale-animation.gif')}" width="${d.gif}" height="${d.imageHeight}" alt="PubScale animated logo and services" style="display:block;width:${d.gif}px;height:${d.imageHeight}px;border:0;"></a></td>`+
+    `<td width="${d.divider}" bgcolor="#33bdb8" style="width:${d.divider}px;background-color:#33bdb8;font-size:1px;line-height:1px;">&nbsp;</td>`+
+    `<td width="${d.right}" valign="middle" style="width:${d.right}px;padding:${Math.max(8,Math.round(14*width/640))}px ${Math.max(6,Math.round(10*width/640))}px ${Math.max(8,Math.round(14*width/640))}px ${d.rightPad}px;vertical-align:middle;overflow-wrap:break-word;"><table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tbody>`+
+    `<tr><td style="font-size:${d.name}px;line-height:${d.name+6}px;font-weight:700;color:#111111;padding:0 0 3px 0;">${name}</td></tr>`+
+    `<tr><td style="font-size:${d.role}px;line-height:${d.role+5}px;color:#444444;padding:0 0 3px 0;">${job}</td></tr>`+
+    `<tr><td style="font-size:${d.info}px;line-height:${d.info+6}px;padding:0 0 3px 0;"><a href="${SITE}" style="color:#24aca6;text-decoration:underline;">www.pubscale.com</a></td></tr>`+
+    `<tr><td style="font-size:${d.info}px;line-height:${d.info+6}px;color:#444444;padding:0 0 ${Math.max(8,Math.round(13*width/640))}px 0;">${companyLine}</td></tr>`+
+    `<tr><td><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tbody><tr>${socials}</tr></tbody></table></td></tr>`+
+    `</tbody></table></td></tr></tbody></table>`;
+}
+function setSize(width) {
+  selectedWidth = Number(width);
+  el('customWidth').value = selectedWidth;
+  el('widthDisplay').textContent = `${selectedWidth} px`;
+  document.querySelectorAll('.preset').forEach(btn=>btn.setAttribute('aria-pressed',btn.dataset.width===String(selectedWidth)?'true':'false'));
+  render();
+}
+function render() {el('preview').innerHTML=signatureHTML();el('status').textContent='';}
+function validate() {
+  if(location.protocol!=='https:') throw Error('Open the published GitHub Pages HTTPS website before copying or downloading for Gmail.');
+  if(!clean(el('employeeName').value)) throw Error('Please enter an employee name.');
+}
+for(const id of names) el(id).addEventListener('input',render);
+for(const btn of document.querySelectorAll('.preset')) btn.addEventListener('click',()=>setSize(btn.dataset.width));
+el('customWidth').addEventListener('input',event=>setSize(event.target.value));
+el('copyButton').addEventListener('click', async()=>{
+  try{
+    validate();
+    const html=signatureHTML();
+    if(!navigator.clipboard?.write || typeof ClipboardItem==='undefined')throw Error('Rich HTML clipboard is unavailable in this browser. Download HTML, open it in Chrome, and copy the rendered signature.');
+    const plain=[clean(el('employeeName').value),clean(el('designation').value),COMPANY_LINE,SITE].join(' | ');
+    await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([plain],{type:'text/plain'})})]);
+    el('status').textContent=`Copied ${selectedWidth}px signature! Paste it into Gmail's signature editor.`;
+  }catch(error){el('status').textContent=error.message;}
+});
+el('downloadButton').addEventListener('click',()=>{
+  try{
+    validate();
+    const page=`<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${signatureHTML()}</body></html>`;
+    const url=URL.createObjectURL(new Blob([page],{type:'text/html'}));
+    const a=document.createElement('a');a.href=url;a.download=`pubscale-signature-${selectedWidth}px.html`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    el('status').textContent='Downloaded HTML. Open the file in a browser and copy the rendered signature.';
+  }catch(error){el('status').textContent=error.message;}
+});
+render();
+</script>
+</body></html>
